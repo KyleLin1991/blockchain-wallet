@@ -1,0 +1,28 @@
+server:
+  port: 8080
+# Runtime environment Setting ------------------------------------------------------------------------
+runtime:
+  environment: local
+  default-err-msg: 很抱歉，系統發生錯誤，請與系統管理人員聯絡!!
+
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blockchain_wallet
+    username: postgres
+    password: Kyle0817
+
+# Security Setting -----------------------------------------------------------------------------------
+security:
+  ignore-security-check-uri-list:
+    /swagger-ui/**,
+    /v3/api-docs/**,
+    /swagger-resources/**,
+
+jwt:
+  publicKeyPem: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx39ITN8jwctXfQdQCE4xIhYDfltPOvfp2mCs5mdS6jt293XdCyPN4nY35Wo1RIOb5dpcNg1MGSKhKUY5UQ1UcU9Gn/25WrQqzsumvdixyyxplSqo674h2bEWWABRcLHsELzzGpk0WrCpndvJcLcsD6ilC4DwZyroT9aJSVjnZLK58qc8viD42u07f9C8iTcLAiJ+WL1xbwET29yJjHwiC7UZQngDnvmEVjQpPxED34miLNnB9SC+Mz2jhj/CDtwQZ9ihNkNCTZmI9aQqm8yi9WFwlYFEc2ZpffzZIBOkmBRRefiYHqKTxFsnWZt5/KDdY3BUZmrxS2Ln8GboIs0cWwIDAQAB
+  privateKeyPem: MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDHf0hM3yPBy1d9B1AITjEiFgN+W0869+naYKzmZ1LqO3b3dd0LI83idjflajVEg5vl2lw2DUwZIqEpRjlRDVRxT0af/blatCrOy6a92LHLLGmVKqjrviHZsRZYAFFwsewQvPMamTRasKmd28lwtywPqKULgPBnKuhP1olJWOdksrnypzy+IPja7Tt/0LyJNwsCIn5YvXFvARPb3ImMfCILtRlCeAOe+YRWNCk/EQPfiaIs2cH1IL4zPaOGP8IO3BBn2KE2Q0JNmYj1pCqbzKL1YXCVgURzZml9/NkgE6SYFFF5+JgeopPEWydZm3n8oN1jcFRmavFLYufwZugizRxbAgMBAAECggEACBQxe1t1+T0g1+FZ7lwsRTMbBRzxgnPTtpI/rjz08KNj1/Wf8/mJNuiOru20Jogl4hMLtOyo7kOmvyMm4w9lIgmR1JzTysaNDT7WC84gtRehVvcZTCKxAD3Zp8qrgaLS6oKcXbFim2GYHNpvt+7TC/dKZ8La+XKVYdZQTPYauMspwTiNKpCOwSfubMUaoxw3Oo74T+e+/Xd+GDbW+ue0jaT4t9HFozHbXDs7mmrerXVkc+IVBe0+k6DxmDR5EBN6u8vGMs23pWmp5EJPdkPXOB2WCYrhuSAa/ajcgJR2whswQwuLnOlV7YPUMvOh9QYH5OIWirE5gXayun55Rqt28QKBgQDw8St7e7zUhsR+yyJU0yVmNTYoZ0k5GlSJizhpPkTB0nF5Gex+fDOq6EZ0PstuY8UQc/wOBJJ64+4DgHFtziC6RDxv0e060sKfhxea6KrxRJVoHXuK3RshtneLCG5RYEMPM68vmh5zgs9v/qvmWiC5xlbw1Hdk0yXcmkhi8ihrZwKBgQDT9wlRc/9P9Jlw0m+SUzamp6vRU0HIUoFejSBxKX8ABWpd6WoBR9yPV0zUrE68/+inNKqvgHIMb/XNDebmbjUud92XlPWHFNpzkUEobxlyzdmFwW9SLuhNluuI/Fn1Z9vVcnuyKulTfV+Q47rSp7Xfz9aAoA6Js9R3D8gdrTIi7QKBgQC3tguDgdt+6KsWSmiI6N3RSq1arTZFle/zV/XROStP5dejkMKjxqvWmnht1htitivh2a3MOmw9y2EFxn+2S77kh3bVg+kwOtcur+Ctus3sXHDXC/PQ87nmQKxxlCIZZh57jtr6nratOIZWTIZhg0MEo1hTFI1ckSqDRBgBacar7QKBgQCY4mgALjCK1RwPelkrK4YRsoKFWw3plUjmj9hEhu+pbj6IOiFRhymY4hjylM2+GL8QSzaJm5WnTuH14v8WWYtWVvKnsLNfmTTvgmeC6I9sdPleNmU628aGoEKG7a1dCmpPjGGX4sekhpt1gCxyYLEYG2rWH5wcym6G6gUnEpNFCQKBgQCyw1EyM/ORkSElpeRqBnC8wvcnrzmxLg7KAsPK9tl4Vu8R2F72DdAqtx/ZG5IWVcoSQ+jhJc0E9JzVzambSaFAzaEpRbhI8kH/P5pDYicE4kfHmg+s7zF5zNAN7LbiXIAsdaRXhHiKpa7h1zi/QSDfSPEOu/cKFwFgWQXMCjoKzQ==
+  #  header: jwtHeader
+  expiration: #jwt token???????
+    login: 36000
+    resetPassword: 900
