@@ -19,7 +19,7 @@
     <modules>
 		<module>starter</module>
         <module>base</module>
-		<module>member</module>
+		<module>auth</module>
 		<module>wallet</module>
 	</modules>
 

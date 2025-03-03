@@ -11,7 +11,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import tw.com.kyle.dto.RestApiListResponse;
 import tw.com.kyle.dto.RestApiOneResponse;
+
+import java.util.List;
 
 /**
  * @author Kyle
@@ -76,6 +79,24 @@ public class BaseController {
             log.trace(logParams);
         }
         RestApiOneResponse<T> response = new RestApiOneResponse<T>();
+        response.setResult(body);
+
+        return response;
+    }
+
+    /**
+     * 取得預設多筆筆執行成功結果
+     *
+     * @param body 請求處理結果內容清單
+     * @return RestApiOneResponse<T> 處理結果
+     */
+    protected final <T> RestApiListResponse<T> doGetDefaultListResult(List<T> body) {
+        if (log.isTraceEnabled()) {
+            JSONObject logParams = new JSONObject().put("body", body);
+            log.trace(logParams);
+        }
+
+        RestApiListResponse<T> response = new RestApiListResponse<T>();
         response.setResult(body);
 
         return response;
