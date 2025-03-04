@@ -12,22 +12,22 @@ import org.hibernate.annotations.DynamicInsert;
 
 /**
  * @author Kyle
- * @since 2025/3/3
+ * @since 2025/3/4
  */
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
-@SuperBuilder
 @Entity
-@Schema(description = "使用者角色關聯表")
-@Table(name = "user_n_role", schema = "auth")
-public class UserNRoleEntity extends BaseEntity {
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+@Schema(description = "角色權限關聯表")
+@Table(name = "role_n_privilege", schema = "auth")
+public class RoleNPrivilegeEntity extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
+
+    @ManyToOne
+    @JoinColumn(name = "privilege_id", nullable = false)
+    private PrivilegeEntity privilege;
 }

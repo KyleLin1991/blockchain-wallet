@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum UserStatus {
+public enum EnableStatus {
 
     @Schema(description = "停用")
     DISABLE("0"),

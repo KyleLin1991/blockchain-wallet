@@ -16,26 +16,26 @@ import java.util.List;
 
 /**
  * @author Kyle
- * @since 2025/3/3
+ * @since 2025/3/4
  */
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
-@SuperBuilder
 @Entity
-@Schema(description = "角色")
-@Table(name = "role", schema = "auth")
-public class RoleEntity extends BaseEntity {
+@Schema(description = "權限表")
+@Table(name = "privilege", schema = "auth")
+public class PrivilegeEntity extends BaseEntity {
 
-    @Column(name = "name", nullable = false, length = 32)
-    private String name;
+    @Column(name = "pid", nullable = false, length = 32)
+    private String pid;
+
+    @Column(name = "description", length = 32)
+    private String description;
 
     @Column(name = "status", length = 1)
     private EnableStatus status;
 
-    @OneToMany(mappedBy = "role")
-    private List<UserNRoleEntity> users = new ArrayList<>();;
-
-    @OneToMany(mappedBy = "role")
-    private List<RoleNPrivilegeEntity> privileges = new ArrayList<>();;
+    @OneToMany(mappedBy = "privilege")
+    private List<RoleNPrivilegeEntity> roles = new ArrayList<>();;
 }

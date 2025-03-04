@@ -6,16 +6,13 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum Role {
+public enum UserType {
 
     @Schema(description = "前台使用者")
     FRONT_USER("0"),
 
     @Schema(description = "後台使用者")
-    BACK_USER("1"),
-
-    @Schema(description = "系統管理員")
-    ADMIN("2");
+    BACK_USER("1");
 
 	private final String value;
 }
