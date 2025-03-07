@@ -1,5 +1,6 @@
-package tw.com.kyle.dto;
+package tw.com.kyle.controller.req;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,22 +8,22 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author Kyle
- * @since 2025/2/26
+ * @since 2025/3/4
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserTokenDto implements Serializable {
+public class LoginReqDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String sub;
+    @NotEmpty(message = "帳號不能為空")
     private String account;
-    private List<RoleDto> roles;
-    private List<PrivilegeDto> privileges;
+
+    @NotEmpty(message = "密碼不能為空")
+    private String password;
 }

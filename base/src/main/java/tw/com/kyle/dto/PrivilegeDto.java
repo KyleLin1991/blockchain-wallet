@@ -7,22 +7,19 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author Kyle
- * @since 2025/2/26
+ * @since 2025/3/6
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserTokenDto implements Serializable {
+public class PrivilegeDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String sub;
-    private String account;
-    private List<RoleDto> roles;
-    private List<PrivilegeDto> privileges;
+    private String pid;
+    private String description;
 }

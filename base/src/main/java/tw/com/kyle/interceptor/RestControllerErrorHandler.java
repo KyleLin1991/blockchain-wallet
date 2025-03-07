@@ -48,7 +48,7 @@ public class RestControllerErrorHandler {
             log.error(logParams);
         }
         // 錯誤印出
-        e.getLocalizedMessage();
+        log.error("Unexpected error occurred", e);
 
         BaseRestApiResponse response = new BaseRestApiResponse();
         response.setStatus("500"); // 500: Internal Server Error
@@ -73,6 +73,9 @@ public class RestControllerErrorHandler {
 
             log.error(logParams);
         }
+        // 錯誤印出
+        log.error("Unexpected error occurred", e);
+
         BaseRestApiResponse response = new BaseRestApiResponse();
         response.setStatus(String.valueOf(e.getStatusCode().value()));
         response.setMsgs(Collections.singletonList(e.getReason()));
@@ -96,6 +99,8 @@ public class RestControllerErrorHandler {
 
             log.error(logParams);
         }
+        // 錯誤印出
+        log.error("Unexpected error occurred", e);
 
         BaseRestApiResponse response = new BaseRestApiResponse();
         response.setStatus("412"); // 412: Precondition Failed
@@ -120,6 +125,8 @@ public class RestControllerErrorHandler {
 
             log.error(logParams);
         }
+        // 錯誤印出
+        log.error("Unexpected error occurred", e);
 
         BaseRestApiResponse response = new BaseRestApiResponse();
         response.setStatus("412"); // 412: Precondition Failed

@@ -9,10 +9,10 @@ import lombok.Getter;
 public enum EnableStatus {
 
     @Schema(description = "停用")
-    DISABLE("0"),
+    DISABLE(0),
 
     @Schema(description = "啟用")
-    ENABLE("1"),;
+    ENABLE(1),;
 
-	private final String value;
+	private final Integer value;
 }

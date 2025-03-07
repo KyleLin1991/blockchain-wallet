@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import tw.com.kyle.util.JwtTokenUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,11 +40,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.replace(TOKEN_PREFIX, "");
 
             Optional<Map<String, Object>> opt = jwtTokenUtil.parseToken(token);
+
             opt.ifPresent(map -> {
+                String account = (String) map.get("sub");
+                // 解析 roles
+                List<String> roles = ((List<?>) map.get("roles")).stream()
+                        .map(obj -> {
+                            if (obj instanceof Map) {
+                                return (String) ((Map<?, ?>) obj).get("roleCode"); // 提取 roleCode
+                            }
+                            return obj.toString();
+                        })
+                        .toList();
+                // 解析 privileges
+                List<String> privileges = ((List<?>) map.get("privileges")).stream()
+                        .map(obj -> {
+                            if (obj instanceof Map) {
+                                return (String) ((Map<?, ?>) obj).get("pid"); // 提取 pid
+                            }
+                            return obj.toString();
+                        })
+                        .toList();
+
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                authorities.addAll(roles.stream().map(SimpleGrantedAuthority::new).toList());
+                authorities.addAll(privileges.stream().map(SimpleGrantedAuthority::new).toList());
+
                 var authentication = new UsernamePasswordAuthenticationToken(
-                        map.get("sub"),
-                        map,
-                        List.of(new SimpleGrantedAuthority(map.get("roles").toString())));
+                        account,
+                        null,
+                        authorities
+                );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             });
         }

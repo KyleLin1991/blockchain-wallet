@@ -3,26 +3,27 @@ package tw.com.kyle.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import tw.com.kyle.enums.EnableStatus;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Kyle
  * @since 2025/2/27
  */
+@Getter
+@Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
-@SuperBuilder
 @Entity
 @Schema(description = "使用者")
 @Table(name = "user", schema = "auth")
-public class UserEntity extends BaseEntity {
+public class UserEntity extends BaseTimeEntity {
 
     @Column(name = "first_name", nullable = false, length = 32)
     private String firstName;
@@ -43,9 +44,6 @@ public class UserEntity extends BaseEntity {
     private EnableStatus enableStatus;
 
     @OneToOne
-    @JoinColumn(name = "account_id", referencedColumnName = "id")
+    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
     private AccountEntity account;
-
-    @OneToMany(mappedBy = "user")
-    private List<UserNRoleEntity> roles = new ArrayList<>();;
 }

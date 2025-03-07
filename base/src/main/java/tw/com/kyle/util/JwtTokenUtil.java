@@ -66,6 +66,7 @@ public class JwtTokenUtil {
         Claims claims = Jwts.claims()
                 .add("account", info.getAccount())
                 .add("roles", info.getRoles())
+                .add("privileges", info.getPrivileges())
                 .build();
 
         return Jwts.builder()

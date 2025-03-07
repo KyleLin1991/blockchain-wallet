@@ -6,7 +6,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import tw.com.kyle.enums.EnableStatus;
@@ -18,6 +20,8 @@ import java.util.List;
  * @author Kyle
  * @since 2025/3/4
  */
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,7 +29,7 @@ import java.util.List;
 @Entity
 @Schema(description = "權限表")
 @Table(name = "privilege", schema = "auth")
-public class PrivilegeEntity extends BaseEntity {
+public class PrivilegeEntity extends IdEntity {
 
     @Column(name = "pid", nullable = false, length = 32)
     private String pid;

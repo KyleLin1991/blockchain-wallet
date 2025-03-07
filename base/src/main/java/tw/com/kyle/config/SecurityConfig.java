@@ -1,5 +1,6 @@
 package tw.com.kyle.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import tw.com.kyle.bean.PathBasedAuthorizationManager;
 import tw.com.kyle.filter.JwtAuthenticationFilter;
 import tw.com.kyle.filter.SafetyHttpRequestFilter;
 
@@ -33,11 +35,9 @@ public class SecurityConfig {
     @Value("${security.ignore-security-check-uri-list}")
     private String[] AUTH_WHITELIST;
 
-    @Autowired
-    private AuthorizationManager<RequestAuthorizationContext> authorizationManager;
-
     private final SafetyHttpRequestFilter safetyHttpRequestFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final PathBasedAuthorizationManager pathBasedAuthorizationManager;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -47,9 +47,14 @@ public class SecurityConfig {
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .anyRequest().access(authorizationManager))
+                        .anyRequest().access(pathBasedAuthorizationManager))
                 .addFilterBefore(safetyHttpRequestFilter, SecurityContextHolderFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden")))
                 .build();
     }
 

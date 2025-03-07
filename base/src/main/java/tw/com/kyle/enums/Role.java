@@ -8,14 +8,23 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Role {
 
-    @Schema(description = "前台使用者")
-    FRONT_USER("0"),
+    @Schema(description = "系統管理員")
+    ADMIN("ROLE_01"),
 
     @Schema(description = "後台使用者")
-    BACK_USER("1"),
+    BACK_USER("ROLE_02"),
 
-    @Schema(description = "系統管理員")
-    ADMIN("2");
+    @Schema(description = "前台使用者")
+    FRONT_USER("ROLE_03");
 
 	private final String value;
+
+    public static Role fromValue(String value) {
+        for (Role role : Role.values()) {
+            if (role.value.equals(value)) {
+                return role;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant with value " + value);
+    }
 }

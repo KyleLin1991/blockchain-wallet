@@ -22,12 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
-public class BaseEntity {
-
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @Column(name = "id", nullable = false)
-    private UUID id;
+public class BaseTimeEntity extends IdEntity {
 
     @Column(name = "cr_user")
     private UUID crUser;
