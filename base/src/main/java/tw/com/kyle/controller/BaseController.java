@@ -1,4 +1,4 @@
-package tw.com.kyle;
+package tw.com.kyle.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;

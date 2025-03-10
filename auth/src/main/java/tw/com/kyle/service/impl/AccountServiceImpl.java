@@ -55,17 +55,13 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 
             log.debug(logParams);
         }
-        boolean isAdmin = authentication != null && authentication.isAuthenticated() &&
-                authentication.getAuthorities().stream()
-                        .anyMatch(auth -> Role.ADMIN.getValue().equals(auth.getAuthority()));
-
         Role role = Role.fromValue(registerReqDto.getType());
 
         if (Role.ADMIN.equals(role) || Role.BACK_USER.equals(role)) {
-            if (isAdmin) {
+            if (super.checkIsAdmin(authentication)) {
                 return buildAccount(registerReqDto.getAccount(), registerReqDto.getPassword(), role);
             } else {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "只有系統管理員可以註冊管理員及後台使用者!!");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "無權限註冊管理員及後台使用者!!");
             }
         } else {
             return buildAccount(registerReqDto.getAccount(), registerReqDto.getPassword(), role);
@@ -126,17 +122,17 @@ public class AccountServiceImpl extends BaseService implements AccountService {
         return loginRespDto;
     }
 
-    private RegisterRespDto buildAccount(String account, String password, Role type) {
+    private RegisterRespDto buildAccount(String account, String password, Role role) {
         AccountEntity accountEntity = AccountEntity.builder()
                 .account(account)
                 .password(passwordEncrypt(password))
-                .type(type)
+                .roleCode(role)
                 .status(EnableStatus.ENABLE)
                 .build();
 
         accountRepository.save(accountEntity);
 
-        RoleEntity roleEntity = roleRepository.findByRoleCode(type);
+        RoleEntity roleEntity = roleRepository.findByRoleCode(role);
 
         accountNRoleRepository.save(AccountNRoleEntity.builder()
                 .account(accountEntity)

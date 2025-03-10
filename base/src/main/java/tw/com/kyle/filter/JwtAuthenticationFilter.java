@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Optional<Map<String, Object>> opt = jwtTokenUtil.parseToken(token);
 
             opt.ifPresent(map -> {
-                String account = (String) map.get("sub");
+                String accountId = (String) map.get("sub");
                 // 解析 roles
                 List<String> roles = ((List<?>) map.get("roles")).stream()
                         .map(obj -> {
@@ -67,8 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authorities.addAll(privileges.stream().map(SimpleGrantedAuthority::new).toList());
 
                 var authentication = new UsernamePasswordAuthenticationToken(
-                        account,
-                        null,
+                        accountId,
+                        map,
                         authorities
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);

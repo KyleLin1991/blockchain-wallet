@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tw.com.kyle.BaseController;
 import tw.com.kyle.controller.req.LoginReqDto;
 import tw.com.kyle.controller.req.RegisterReqDto;
 import tw.com.kyle.controller.resp.LoginRespDto;

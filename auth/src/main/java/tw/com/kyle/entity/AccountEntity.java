@@ -28,7 +28,8 @@ import java.util.List;
 @DynamicInsert
 @Entity
 @Schema(description = "帳號")
-@Table(name = "account", schema = "auth")
+@Table(name = "account", schema = "auth",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"account", "type"}))
 public class AccountEntity extends IdEntity {
 
     @Column(name = "account", unique = true, nullable = false, length = 128)
@@ -37,9 +38,9 @@ public class AccountEntity extends IdEntity {
     @Column(name = "password", nullable = false, length = 128)
     private String password;
 
-    @Column(name = "type", nullable = false, length = 12)
+    @Column(name = "role_code", nullable = false, length = 12)
     @Convert(converter = RoleConverter.class)
-    private Role type;
+    private Role roleCode;
 
     @Column(name = "status", length = 1)
     @Convert(converter = EnableStatusConverter.class)

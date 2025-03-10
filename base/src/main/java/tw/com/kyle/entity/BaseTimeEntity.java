@@ -24,15 +24,15 @@ import java.util.UUID;
 @MappedSuperclass
 public class BaseTimeEntity extends IdEntity {
 
-    @Column(name = "cr_user")
-    private UUID crUser;
+    @Column(name = "cr_account")
+    private UUID crAccount;
 
     @Schema(name = "建立時間")
     @Column(name = "cr_datetime", nullable = false)
     protected Timestamp crDatetime;
 
-    @Column(name = "up_user")
-    private UUID upUser;
+    @Column(name = "up_account")
+    private UUID upAccount;
 
     @Schema(name = "修改時間")
     @Column(name = "up_datetime")

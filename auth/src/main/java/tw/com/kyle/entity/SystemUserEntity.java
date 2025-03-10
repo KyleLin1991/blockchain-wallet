@@ -21,15 +21,12 @@ import tw.com.kyle.enums.EnableStatus;
 @AllArgsConstructor
 @DynamicInsert
 @Entity
-@Schema(description = "前台使用者")
-@Table(name = "user", schema = "auth")
-public class UserEntity extends BaseTimeEntity {
+@Schema(description = "後台使用者")
+@Table(name = "system_user", schema = "auth")
+public class SystemUserEntity extends BaseTimeEntity {
 
-    @Column(name = "first_name", nullable = false, length = 32)
-    private String firstName;
-
-    @Column(name = "last_name", nullable = false, length = 32)
-    private String lastName;
+    @Column(name = "name", nullable = false, length = 32)
+    private String name;
 
     @Column(name = "email", unique = true, nullable = false, length = 128)
     private String email;

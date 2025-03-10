@@ -21,6 +21,11 @@ spring:
       connection-timeout: 60000
       connection-test-query: SELECT 1
 
+logging:
+  level:
+    root: INFO
+    tw.com: DEBUG
+
 # Security Setting -----------------------------------------------------------------------------------
 security:
   ignore-security-check-uri-list:
