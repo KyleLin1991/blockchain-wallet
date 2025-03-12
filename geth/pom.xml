@@ -10,7 +10,7 @@
         <version>2.0</version>
     </parent>
 
-    <artifactId>wallet</artifactId>
+    <artifactId>geth</artifactId>
 
     <properties>
         <!--        跳過可執行 JAR 或 WAR 檔案的重新打包 -->

@@ -1,4 +1,4 @@
-package tw.com.kyle.entity;
+package tw.com.kyle.entity.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -11,6 +11,7 @@ import org.hibernate.annotations.DynamicInsert;
 import tw.com.kyle.enums.EnableStatus;
 import tw.com.kyle.enums.Role;
 import tw.com.kyle.enums.converter.RoleConverter;
+import tw.com.kyle.entity.IdEntity;
 
 import java.util.ArrayList;
 import java.util.List;

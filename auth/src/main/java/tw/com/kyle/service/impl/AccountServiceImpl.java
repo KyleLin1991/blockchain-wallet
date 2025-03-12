@@ -15,15 +15,15 @@ import tw.com.kyle.controller.resp.RegisterRespDto;
 import tw.com.kyle.dto.PrivilegeDto;
 import tw.com.kyle.dto.RoleDto;
 import tw.com.kyle.dto.UserTokenDto;
-import tw.com.kyle.entity.AccountEntity;
-import tw.com.kyle.entity.AccountNRoleEntity;
-import tw.com.kyle.entity.RoleEntity;
-import tw.com.kyle.entity.RoleNPrivilegeEntity;
+import tw.com.kyle.entity.auth.AccountEntity;
+import tw.com.kyle.entity.auth.AccountNRoleEntity;
+import tw.com.kyle.entity.auth.RoleEntity;
+import tw.com.kyle.entity.auth.RoleNPrivilegeEntity;
 import tw.com.kyle.enums.EnableStatus;
 import tw.com.kyle.enums.Role;
-import tw.com.kyle.repository.AccountNRoleRepository;
-import tw.com.kyle.repository.AccountRepository;
-import tw.com.kyle.repository.RoleRepository;
+import tw.com.kyle.repository.auth.AccountNRoleRepository;
+import tw.com.kyle.repository.auth.AccountRepository;
+import tw.com.kyle.repository.auth.RoleRepository;
 import tw.com.kyle.service.AccountService;
 import tw.com.kyle.service.BaseService;
 import tw.com.kyle.util.JwtTokenUtil;
@@ -77,9 +77,10 @@ public class AccountServiceImpl extends BaseService implements AccountService {
             log.debug(logParams);
         }
         // 查詢帳號
-        AccountEntity accountEntity = accountRepository.findByAccountAndPasswordAndStatus(
+        AccountEntity accountEntity = accountRepository.findByAccountAndPasswordAndRoleCodeAndStatus(
                 loginRequest.getAccount(),
                 super.passwordEncrypt(loginRequest.getPassword()),
+                loginRequest.getRole(),
                 EnableStatus.ENABLE
         ).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "帳號或密碼錯誤"));
 

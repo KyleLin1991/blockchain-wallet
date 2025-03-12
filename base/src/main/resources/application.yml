@@ -1,9 +1,6 @@
 server:
   port: 8080
 # Runtime environment Setting ------------------------------------------------------------------------
-runtime:
-  environment: local
-  default-err-msg: 很抱歉，系統發生錯誤，請與系統管理人員聯絡!!
 
 spring:
   datasource:

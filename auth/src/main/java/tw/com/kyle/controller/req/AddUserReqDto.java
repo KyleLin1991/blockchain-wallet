@@ -7,11 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tw.com.kyle.enums.Role;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * @author Kyle
@@ -24,12 +22,6 @@ import java.util.UUID;
 public class AddUserReqDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    @NotEmpty(message = "帳號不能為空")
-    private String account;
-
-    @NotEmpty(message = "角色代碼不能為空")
-    private String roleCode;
 
     @Size(max = 32, message = "長度不得超過32")
     @NotEmpty(message = "姓氏不得為空")

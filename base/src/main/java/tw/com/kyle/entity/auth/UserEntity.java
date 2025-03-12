@@ -1,4 +1,4 @@
-package tw.com.kyle.entity;
+package tw.com.kyle.entity.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -8,7 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
+import tw.com.kyle.entity.geth.WalletEntity;
 import tw.com.kyle.enums.EnableStatus;
+import tw.com.kyle.entity.BaseTimeEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kyle
@@ -21,12 +26,15 @@ import tw.com.kyle.enums.EnableStatus;
 @AllArgsConstructor
 @DynamicInsert
 @Entity
-@Schema(description = "後台使用者")
-@Table(name = "system_user", schema = "auth")
-public class SystemUserEntity extends BaseTimeEntity {
+@Schema(description = "前台使用者")
+@Table(name = "user", schema = "auth")
+public class UserEntity extends BaseTimeEntity {
 
-    @Column(name = "name", nullable = false, length = 32)
-    private String name;
+    @Column(name = "first_name", nullable = false, length = 32)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 32)
+    private String lastName;
 
     @Column(name = "email", unique = true, nullable = false, length = 128)
     private String email;
@@ -43,4 +51,7 @@ public class SystemUserEntity extends BaseTimeEntity {
     @OneToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
     private AccountEntity account;
+
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WalletEntity> wallets = new ArrayList<>();
 }

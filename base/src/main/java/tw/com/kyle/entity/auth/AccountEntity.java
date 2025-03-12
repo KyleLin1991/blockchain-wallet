@@ -1,4 +1,4 @@
-package tw.com.kyle.entity;
+package tw.com.kyle.entity.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
+import tw.com.kyle.entity.IdEntity;
 import tw.com.kyle.enums.EnableStatus;
 import tw.com.kyle.enums.Role;
 import tw.com.kyle.enums.converter.EnableStatusConverter;

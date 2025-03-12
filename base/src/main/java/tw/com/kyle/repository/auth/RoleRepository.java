@@ -1,7 +1,7 @@
-package tw.com.kyle.repository;
+package tw.com.kyle.repository.auth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import tw.com.kyle.entity.RoleEntity;
+import tw.com.kyle.entity.auth.RoleEntity;
 import tw.com.kyle.enums.Role;
 
 import java.util.UUID;

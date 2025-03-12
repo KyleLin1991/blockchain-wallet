@@ -1,10 +1,12 @@
 package tw.com.kyle.controller.req;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tw.com.kyle.enums.Role;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -26,4 +28,7 @@ public class LoginReqDto implements Serializable {
 
     @NotEmpty(message = "密碼不能為空")
     private String password;
+
+    @NotNull(message = "角色不能為空")
+    private Role role;
 }

@@ -19,7 +19,7 @@
     <modules>
         <module>base</module>
 		<module>auth</module>
-		<module>wallet</module>
+		<module>geth</module>
 		<module>starter</module>
 	</modules>
 
@@ -124,6 +124,13 @@
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.10.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.web3j/core -->
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>core</artifactId>
+			<version>4.13.0</version>
 		</dependency>
 
 
