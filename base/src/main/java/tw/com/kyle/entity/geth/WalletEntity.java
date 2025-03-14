@@ -31,9 +31,6 @@ public class WalletEntity extends BaseTimeEntity {
     @Column(name = "address", unique = true, nullable = false, length = 128)
     private String address;
 
-    @Column(name = "password", nullable = false, length = 128)
-    private String password;
-
     @Column(name = "balance")
     private BigDecimal balance;
 

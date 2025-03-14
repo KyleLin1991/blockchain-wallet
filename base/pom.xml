@@ -7,11 +7,11 @@
     <parent>
         <groupId>tw.com.kyle</groupId>
         <artifactId>blockchain-wallet</artifactId>
-        <version>2.0</version>
+        <version>1.0</version>
     </parent>
 
     <artifactId>base</artifactId>
-    <version>2.0</version>
+    <version>1.0</version>
     <name>base</name>
     <packaging>jar</packaging>
     <description>Base project for blockchain-wallet Backend</description>

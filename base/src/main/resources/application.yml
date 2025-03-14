@@ -1,8 +1,9 @@
 server:
   port: 8080
-# Runtime environment Setting ------------------------------------------------------------------------
 
 spring:
+  application:
+    name: blockchain-wallet
   datasource:
     url: jdbc:postgresql://localhost:5432/blockchain_wallet
     username: postgres
@@ -18,10 +19,20 @@ spring:
       connection-timeout: 60000
       connection-test-query: SELECT 1
 
+  vault:
+    scheme: http
+    host: 127.0.0.1
+    port: 8200
+    token: ${VAULT_TOKEN}
+
 logging:
   level:
     root: INFO
     tw.com: DEBUG
+
+geth:
+  node-url: http://localhost:8545
+  wallet-path: C:\codeLab\study-blockchain\sepolia-snap\wallet
 
 # Security Setting -----------------------------------------------------------------------------------
 security:
