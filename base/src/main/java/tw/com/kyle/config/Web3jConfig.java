@@ -1,12 +1,11 @@
 package tw.com.kyle.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
-
-import java.net.ConnectException;
+import tw.com.kyle.misc.GethProperties;
 
 /**
  * @author Kyle
@@ -15,10 +14,13 @@ import java.net.ConnectException;
 @Configuration
 public class Web3jConfig {
 
-    @Value("${geth.node-url}")
-    private String nodeUrl;
+    @Autowired
+    private GethProperties gethProperties;
 
     @Bean
-    public Web3j initWeb3j() throws ConnectException { return Web3j.build(new HttpService(nodeUrl)); }
+    public Web3j initWeb3j() { return Web3j.build(new HttpService(
+            gethProperties.getNodeUrl() + gethProperties.getApiKey())
+        );
+    }
 
 }

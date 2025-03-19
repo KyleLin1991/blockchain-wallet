@@ -26,6 +26,7 @@ import tw.com.kyle.service.WalletService;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
@@ -80,7 +81,7 @@ public class WalletServiceImpl extends BaseService implements WalletService {
 
                 walletRepository.save(WalletEntity.builder()
                         .address(walletAddress)
-                        .balance(BigDecimal.ZERO)
+                        .balance(BigInteger.ZERO)
                         .userEntity(accountEntity.getUser())
                         .crAccount(accountEntity.getId())
                         .build()
@@ -97,7 +98,7 @@ public class WalletServiceImpl extends BaseService implements WalletService {
                                 .crDatetime(Timestamp.from(Instant.now()))
                                 .build()
                 );
-
+                
                 return CreateWalletRespDto.builder()
                         .address(walletAddress)
                         .balance(BigDecimal.ZERO)

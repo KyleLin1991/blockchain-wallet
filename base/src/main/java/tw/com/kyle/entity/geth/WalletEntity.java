@@ -11,7 +11,7 @@ import org.hibernate.annotations.DynamicInsert;
 import tw.com.kyle.entity.BaseTimeEntity;
 import tw.com.kyle.entity.auth.UserEntity;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * @author Kyle
@@ -32,7 +32,7 @@ public class WalletEntity extends BaseTimeEntity {
     private String address;
 
     @Column(name = "balance")
-    private BigDecimal balance;
+    private BigInteger balance;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)

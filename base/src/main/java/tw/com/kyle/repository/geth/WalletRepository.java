@@ -3,6 +3,7 @@ package tw.com.kyle.repository.geth;
 import org.springframework.data.jpa.repository.JpaRepository;
 import tw.com.kyle.entity.geth.WalletEntity;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -11,4 +12,5 @@ import java.util.UUID;
  */
 public interface WalletRepository extends JpaRepository<WalletEntity, UUID> {
 
+    Optional<WalletEntity> findByAddress(String address);
 }

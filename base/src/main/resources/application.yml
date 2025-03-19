@@ -31,7 +31,9 @@ logging:
     tw.com: DEBUG
 
 geth:
-  node-url: http://localhost:8545
+#  node-url: http://localhost:8545  # 自建節點所需容量不足，先改用alchemy
+  node-url: https://eth-sepolia.g.alchemy.com/v2/
+#  api-key: ${API_KEY}  # alchemy api key
   wallet-path: C:\codeLab\study-blockchain\sepolia-snap\wallet
 
 # Security Setting -----------------------------------------------------------------------------------
