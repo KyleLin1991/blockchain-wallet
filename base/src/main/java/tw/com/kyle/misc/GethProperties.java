@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Configuration;
 public class GethProperties {
 
     private String nodeUrl;
+    private String wsNodeUrl;
     private String apiKey;
     private String walletPath;
+    private long reconnectDelayMs;
 }

@@ -12,5 +12,6 @@ import java.util.UUID;
  */
 public interface WalletRepository extends JpaRepository<WalletEntity, UUID> {
 
-    Optional<WalletEntity> findByAddress(String address);
+    Optional<WalletEntity> findByAddressIgnoreCase(String address);
+    Optional<WalletEntity> findByAddressAndCrAccount(String address, UUID account);
 }

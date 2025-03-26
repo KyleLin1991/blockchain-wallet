@@ -23,6 +23,7 @@ spring:
     scheme: http
     host: 127.0.0.1
     port: 8200
+    key-path: secret/${spring.application.name}/wallets/
     token: ${VAULT_TOKEN}
 
 logging:
@@ -33,8 +34,10 @@ logging:
 geth:
 #  node-url: http://localhost:8545  # 自建節點所需容量不足，先改用alchemy
   node-url: https://eth-sepolia.g.alchemy.com/v2/
-#  api-key: ${API_KEY}  # alchemy api key
+  wsNode-url: wss://eth-sepolia.g.alchemy.com/v2/
+  api-key: ${API_KEY}  # alchemy api key
   wallet-path: C:\codeLab\study-blockchain\sepolia-snap\wallet
+  reconnectDelayMs: 5000
 
 # Security Setting -----------------------------------------------------------------------------------
 security:

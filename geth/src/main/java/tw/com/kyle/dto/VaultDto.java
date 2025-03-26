@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class VaultReq implements Serializable {
+public class VaultDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 

@@ -1,10 +1,7 @@
 package tw.com.kyle.entity.geth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,15 +25,9 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @DynamicInsert
 @Entity
-@Schema(description = "交易")
-@Table(name = "transaction", schema = "geth")
-public class TransactionEntity extends CreateTimeEntity {
-
-    @Column(name = "hash", nullable = false)
-    private byte[] hash;
-
-    @Column(name = "nonce", nullable = false)
-    private BigInteger nonce;
+@Schema(description = "出金")
+@Table(name = "withdraw", schema = "geth")
+public class WithdrawEntity extends CreateTimeEntity {
 
     @Column(name = "\"from\"", nullable = false, length = 128)
     private String from;
@@ -44,16 +35,14 @@ public class TransactionEntity extends CreateTimeEntity {
     @Column(name = "\"to\"", nullable = false, length = 128)
     private String to;
 
-    @Column(name = "gas_price", nullable = false)
-    private BigInteger gasPrice;
-
-    @Column(name = "gas", nullable = false)
-    private BigInteger gas;
-
-    @Column(name = "gas_used", nullable = false)
-    private BigInteger gasUsed;
+    @Column(name = "balance", nullable = false)
+    private BigInteger balance;
 
     @Column(name = "status", nullable = false)
     @Convert(converter = TransactionStatusConverter.class)
     private TransactionStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transaction_hash", nullable = false, updatable = false)
+    private TransactionEntity transaction;
 }

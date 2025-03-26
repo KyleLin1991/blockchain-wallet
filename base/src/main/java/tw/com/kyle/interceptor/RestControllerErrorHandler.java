@@ -45,11 +45,9 @@ public class RestControllerErrorHandler {
         // 錯誤印出
         log.error("Unexpected error occurred", e);
 
-        String errorTitle = extractErrorTitle(e);
-
         BaseRestApiResponse response = new BaseRestApiResponse();
         response.setStatus("500");
-        response.setMsgs(Collections.singletonList(errorTitle));
+        response.setMsgs(Collections.singletonList(e.getMessage()));
 
         return response;
     }
@@ -130,18 +128,5 @@ public class RestControllerErrorHandler {
         response.setMsgs(e.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList()));
 
         return response;
-    }
-
-    private String extractErrorTitle(Exception e) {
-        if (e instanceof DataIntegrityViolationException) {
-            return "Duplicate Key Violation";
-        } else if (e instanceof NullPointerException) {
-            return "Null Pointer Exception";
-        } else if (e instanceof IllegalArgumentException) {
-            return "Invalid Argument";
-        } else if (e instanceof SQLException) {
-            return "Database Error";
-        }
-        return "Unexpected Error";
     }
 }

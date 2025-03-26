@@ -9,6 +9,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import tw.com.kyle.entity.CreateTimeEntity;
+import tw.com.kyle.enums.TransactionStatus;
+import tw.com.kyle.enums.converter.TransactionStatusConverter;
 
 import java.math.BigInteger;
 
@@ -37,7 +39,8 @@ public class DepositEntity extends CreateTimeEntity {
     private BigInteger balance;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Convert(converter = TransactionStatusConverter.class)
+    private TransactionStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_hash", nullable = false, updatable = false)
