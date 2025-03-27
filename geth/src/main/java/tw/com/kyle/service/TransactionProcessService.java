@@ -15,9 +15,11 @@ import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthEstimateGas;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.utils.Numeric;
+import tw.com.kyle.controller.resp.WithdrawRespDto;
 import tw.com.kyle.dto.VaultDto;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 
 /**
  * @author Kyle
@@ -40,7 +42,7 @@ public class TransactionProcessService {
         this.vaultTemplate = vaultTemplate;
     }
 
-    public String sendWithdrawTransaction(String fromAddress, String toAddress, BigInteger amount) throws Exception {
+    public WithdrawRespDto sendWithdrawTransaction(String fromAddress, String toAddress, BigInteger amount) throws Exception {
         String privateKey = getPrivateKeyFromVault(fromAddress);
         Credentials credentials = Credentials.create(privateKey);
 
@@ -54,11 +56,21 @@ public class TransactionProcessService {
         String hexValue = Numeric.toHexString(signedMessage);
 
         EthSendTransaction transactionResponse = httpWeb3j.ethSendRawTransaction(hexValue).send();
+
+        log.info("Withdraw transaction sent: " + transactionResponse.getTransactionHash());
         if (transactionResponse.hasError()) {
             throw new RuntimeException("Error sending transaction: " + transactionResponse.getError().getMessage());
         }
 
-        return transactionResponse.getTransactionHash();
+        return WithdrawRespDto.builder()
+                .from(fromAddress)
+                .to(toAddress)
+                .balance(amount.toString())
+                .gasPrice(gasPrice.toString())
+                .nonce(nonce)
+                .transactionHash(transactionResponse.getTransactionHash())
+                .withdrawTime(new Timestamp(System.currentTimeMillis()))
+                .build();
     }
 
     public BigInteger estimateGasLimit(String from, String to, BigInteger amount) throws Exception {
@@ -68,7 +80,7 @@ public class TransactionProcessService {
             throw new RuntimeException("Error estimating gas: " + ethEstimateGas.getError().getMessage());
         }
 
-        return ethEstimateGas.getAmountUsed().multiply(BigInteger.valueOf(12)).divide(BigInteger.TEN); // 增加 20% 緩衝
+        return ethEstimateGas.getAmountUsed().multiply(BigInteger.TEN);
     }
 
     private String getPrivateKeyFromVault(String address) {

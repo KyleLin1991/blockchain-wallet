@@ -14,6 +14,7 @@ import tw.com.kyle.controller.resp.CreateWalletRespDto;
 import tw.com.kyle.controller.resp.WithdrawRespDto;
 import tw.com.kyle.dto.RestApiOneResponse;
 import tw.com.kyle.service.WalletService;
+import tw.com.kyle.service.WithdrawService;
 
 /**
  * @author Kyle
@@ -27,6 +28,7 @@ import tw.com.kyle.service.WalletService;
 public class WalletController extends BaseController {
 
     private final WalletService walletService;
+    private final WithdrawService withdrawService;
 
     @Operation(summary = "建立錢包")
     @PostMapping(value = "/client/wallet")
@@ -45,7 +47,7 @@ public class WalletController extends BaseController {
             log.debug(new JSONObject());
         }
 
-        return super.doGetOneResult(walletService.withdraw(withdrawReqDto, authentication));
+        return super.doGetOneResult(withdrawService.withdraw(withdrawReqDto, authentication));
     }
 
     @Operation(summary = "查詢錢包餘額")

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.filters.FilterException;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -17,16 +16,14 @@ import org.web3j.protocol.websocket.WebSocketService;
 import tw.com.kyle.entity.geth.DepositEntity;
 import tw.com.kyle.entity.geth.TransactionEntity;
 import tw.com.kyle.entity.geth.WalletEntity;
+import tw.com.kyle.entity.geth.WithdrawEntity;
 import tw.com.kyle.enums.TransactionStatus;
 import tw.com.kyle.enums.converter.TransactionStatusConverter;
 import tw.com.kyle.service.websocket.ReconnectListener;
 import tw.com.kyle.service.websocket.ReconnectWebSocketService;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Kyle
@@ -40,7 +37,7 @@ public class EthereumListenerService implements ReconnectListener {
     private final Web3j wsWeb3j;
     private final WebSocketService webSocketService;
     private final DepositService depositService;
-    //    private final WithdrawService withdrawService;
+    private final WithdrawService withdrawService;
     private final WalletService walletService;
     private final TransactionService transactionService;
     private Disposable subscription;
@@ -51,7 +48,6 @@ public class EthereumListenerService implements ReconnectListener {
             @Qualifier("httpWeb3j") Web3j httpWeb3j,
             @Qualifier("wsWeb3j") Web3j wsWeb3j,
             @Qualifier("webSocketService") WebSocketService webSocketService,
-//            @Qualifier("scheduler") ScheduledExecutorService scheduler,
             DepositService depositService,
             WithdrawService withdrawService,
             WalletService walletService,
@@ -60,7 +56,7 @@ public class EthereumListenerService implements ReconnectListener {
         this.wsWeb3j = wsWeb3j;
         this.webSocketService = webSocketService;
         this.depositService = depositService;
-//        this.withdrawService = withdrawService;
+        this.withdrawService = withdrawService;
         this.walletService = walletService;
         this.transactionService = transactionService;
     }
@@ -85,19 +81,7 @@ public class EthereumListenerService implements ReconnectListener {
 
                     log.info("block number: " + blockNumber);
                     processBlockTransactions(ethBlock);
-                }, error -> {
-                    if (error instanceof RejectedExecutionException) {
-                        log.info("Subscription stopped due to scheduler shutdown: " + error.getMessage());
-                    } else {
-                        log.error("Error while listening: " + error.getMessage(), error);
-                        if (error instanceof FilterException || error.getCause() instanceof IOException) {
-                            log.info("WebSocket connection closed, triggering reconnect...");
-                            if (webSocketService instanceof ReconnectWebSocketService) {
-                                ((ReconnectWebSocketService) webSocketService).reconnectOnError();
-                            }
-                        }
-                    }
-                });
+                }, error -> log.error("Error while listening: " + error.getMessage(), error));
 
         log.info("Started listening for incoming transactions via WebSocket");
     }
@@ -112,7 +96,7 @@ public class EthereumListenerService implements ReconnectListener {
 
             // 檢查是否與錢包地址相關
             Optional<WalletEntity> depositWallet = walletService.findByAddressIgnoreCase(toAddress);
-            Optional<WalletEntity> toWallet = walletService.findByAddressIgnoreCase(toAddress);
+            Optional<WalletEntity> withdrawWallet = walletService.findByAddressIgnoreCase(fromAddress);
 
             // 入金：toAddress 是錢包地址且 value > 0
             if (depositWallet.isPresent() && balance.compareTo(BigInteger.ZERO) > 0) {
@@ -121,9 +105,9 @@ public class EthereumListenerService implements ReconnectListener {
             }
 
             // 出金：fromAddress 是錢包地址且 value > 0
-//            if (fromWalletOpt.isPresent() && balance.compareTo(BigInteger.ZERO) > 0) {
-//                processOutgoingTransaction(transaction, fromWalletOpt.get());
-//            }
+            if (withdrawWallet.isPresent() && balance.compareTo(BigInteger.ZERO) > 0) {
+                processWithdrawTransaction(transaction, withdrawWallet.get());
+            }
         });
     }
 
@@ -133,51 +117,102 @@ public class EthereumListenerService implements ReconnectListener {
         String txHash = transaction.getHash();
         BigInteger balance = transaction.getValue();
 
-        if (transactionService.findByHash(txHash.getBytes()).isPresent()) {
-            log.info("Deposit transaction already: " + txHash);
-        } else {
-            try {
-                TransactionReceipt receipt = httpWeb3j.ethGetTransactionReceipt(txHash).send()
-                        .getTransactionReceipt()
-                        .orElseThrow(() -> new ResponseStatusException(
-                                HttpStatus.INTERNAL_SERVER_ERROR,
-                                "Transaction receipt not found for tx: " + txHash
-                        ));
+        httpWeb3j.ethGetTransactionReceipt(txHash)
+                .sendAsync()
+                .thenAccept(response -> {
+                    try {
+                        TransactionReceipt receipt = response.getTransactionReceipt()
+                                .orElseThrow(() -> new ResponseStatusException(
+                                        HttpStatus.INTERNAL_SERVER_ERROR,
+                                        "Transaction receipt not found for tx: " + txHash
+                                ));
 
-                TransactionStatusConverter transactionStatusConverter = new TransactionStatusConverter();
-                TransactionStatus transactionStatus = transactionStatusConverter.convertToEntityAttribute(receipt.getStatus());
+                        TransactionStatusConverter transactionStatusConverter = new TransactionStatusConverter();
+                        TransactionStatus transactionStatus = transactionStatusConverter.convertToEntityAttribute(receipt.getStatus());
 
-                TransactionEntity transactionEntity = TransactionEntity.builder()
-                        .hash(txHash.getBytes())
-                        .nonce(transaction.getNonce())
-                        .from(from)
-                        .to(to)
-                        .gasPrice(transaction.getGasPrice())
-                        .gas(transaction.getGas())
-                        .gasUsed(receipt.getGasUsed())
-                        .status(transactionStatus)
-                        .build();
+                        TransactionEntity transactionEntity = TransactionEntity.builder()
+                                .hash(txHash.getBytes())
+                                .nonce(transaction.getNonce())
+                                .from(from)
+                                .to(to)
+                                .gasPrice(transaction.getGasPrice())
+                                .gas(transaction.getGas())
+                                .gasUsed(receipt.getGasUsed())
+                                .status(transactionStatus)
+                                .build();
 
-                DepositEntity depositEntity = DepositEntity.builder()
-                        .from(from)
-                        .to(to)
-                        .balance(balance)
-                        .status(transactionStatus)
-                        .transaction(transactionEntity)
-                        .build();
+                        DepositEntity depositEntity = DepositEntity.builder()
+                                .from(from)
+                                .to(to)
+                                .balance(balance)
+                                .status(transactionStatus)
+                                .transaction(transactionEntity)
+                                .build();
 
-                BigInteger amount = walletEntity.getBalance().add(balance);
-                walletEntity.setBalance(amount);
+                        BigInteger amount = walletEntity.getBalance().add(balance);
+                        walletEntity.setBalance(amount);
 
-                transactionService.save(transactionEntity);
-                depositService.save(depositEntity);
-                walletService.save(walletEntity);
+                        transactionService.save(transactionEntity);
+                        depositService.save(depositEntity);
+                        walletService.save(walletEntity);
 
-                log.info("Deposit from " + from + " to " + to + " balance " + balance);
-            } catch (Exception e) {
-                log.error("Error processing deposit tx " + txHash + ": " + e.getMessage());
-            }
-        }
+                        log.info("Deposit from " + from + " to " + to + " balance " + balance);
+                    } catch (Exception e) {
+                        log.error("Error processing deposit tx " + txHash + ": " + e.getMessage());
+                    }
+                })
+                .exceptionally(throwable -> {
+                    log.error("Failed to fetch receipt for tx " + txHash + ": " + throwable.getMessage());
+                    return null;
+                });
+    }
+
+    public void processWithdrawTransaction(EthBlock.TransactionObject transaction, WalletEntity walletEntity) {
+        String from = transaction.getFrom();
+        String to = transaction.getTo();
+        String txHash = transaction.getHash();
+        BigInteger balance = transaction.getValue();
+
+        httpWeb3j.ethGetTransactionReceipt(txHash)
+                .sendAsync()
+                .thenAccept(response -> {
+                    try {
+                        TransactionReceipt receipt = response.getTransactionReceipt()
+                                .orElseThrow(() -> new ResponseStatusException(
+                                        HttpStatus.INTERNAL_SERVER_ERROR,
+                                        "Transaction receipt not found for tx: " + txHash
+                                ));
+                        TransactionStatusConverter transactionStatusConverter = new TransactionStatusConverter();
+                        TransactionStatus transactionStatus = transactionStatusConverter.convertToEntityAttribute(receipt.getStatus());
+
+                        TransactionEntity transactionEntity = transactionService.findByHash(txHash.getBytes())
+                                .orElseThrow(() -> new ResponseStatusException(
+                                        HttpStatus.INTERNAL_SERVER_ERROR,
+                                        "Transaction not found for tx: " + txHash
+                                ));
+                        transactionEntity.setGasPrice(transaction.getGasPrice());
+                        transactionEntity.setGas(transaction.getGas());
+                        transactionEntity.setGasUsed(receipt.getGasUsed());
+                        transactionEntity.setStatus(transactionStatus);
+
+                        WithdrawEntity withdrawEntity = withdrawService.findByTransaction(txHash.getBytes());
+                        withdrawEntity.setStatus(transactionStatus);
+
+                        walletEntity.setBalance(new BigInteger(walletService.getBalance(walletEntity.getAddress())));
+
+                        transactionService.save(transactionEntity);
+                        withdrawService.save(withdrawEntity);
+                        walletService.save(walletEntity);
+
+                        log.info("Withdraw from " + from + " to " + to + " balance " + balance);
+                    } catch (Exception e) {
+                        log.error("Error processing Withdraw tx " + txHash + ": " + e.getMessage());
+                    }
+                })
+                .exceptionally(throwable -> {
+                    log.error("Failed to fetch receipt for tx " + txHash + ": " + throwable.getMessage());
+                    return null;
+                });
     }
 
     private void recoverMissedBlocks() {

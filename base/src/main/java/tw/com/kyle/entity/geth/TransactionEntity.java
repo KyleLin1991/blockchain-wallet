@@ -47,10 +47,10 @@ public class TransactionEntity extends CreateTimeEntity {
     @Column(name = "gas_price", nullable = false)
     private BigInteger gasPrice;
 
-    @Column(name = "gas", nullable = false)
+    @Column(name = "gas")
     private BigInteger gas;
 
-    @Column(name = "gas_used", nullable = false)
+    @Column(name = "gas_used")
     private BigInteger gasUsed;
 
     @Column(name = "status", nullable = false)

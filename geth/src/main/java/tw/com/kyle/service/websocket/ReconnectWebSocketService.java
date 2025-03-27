@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.web3j.protocol.websocket.WebSocketService;
 import tw.com.kyle.misc.GethProperties;
 
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Kyle
@@ -55,55 +52,26 @@ public class ReconnectWebSocketService extends WebSocketService {
         } catch (Exception e) {
             isConnected = false;
             log.error("Failed to connect to WebSocket: " + e.getMessage());
-            scheduleReconnect();
+            connectWithRetry();
         }
     }
 
-    @Override
-    public void close() {
-        super.close();
-        isConnected = false;
-        log.info("WebSocket closed");
-        if (!isShuttingDown) {
-            scheduleReconnect();
-        }
-    }
-
-    private void scheduleReconnect() {
-//        if (isShuttingDown || scheduler.isShutdown()) {
-//            log.info("Scheduler is shut down or application is closing, skipping reconnect");
-//            return;
+//    @Override
+//    public void close() {
+//        super.close();
+//        isConnected = false;
+//        log.info("WebSocket closed");
+//        if (!isShuttingDown) {
+//            connectWithRetry();
 //        }
-//        log.info("Scheduling reconnect with delay: " + delayMs + "ms");
-//        try {
-//            scheduler.schedule(() -> {
-//                if (!isShuttingDown) {
-                    log.info("Attempting to reconnect to WebSocket...");
-                    connectWithRetry();
-//                }
-//            }, delayMs, TimeUnit.MILLISECONDS);
-//        } catch (RejectedExecutionException e) {
-//            log.info("Reconnect task rejected due to scheduler shutdown: " + e.getMessage());
-//        }
-    }
+//    }
 
     // 供外部觸發重連
     public void reconnectOnError() {
         if (isConnected && !isShuttingDown) {
             isConnected = false;
             log.info("Detected disconnection, scheduling reconnect...");
-            scheduleReconnect();
+            connectWithRetry();
         }
     }
-//
-//    public void shutdown() {
-//        isShuttingDown = true;
-//
-//        if (scheduler instanceof ScheduledThreadPoolExecutor executor) {
-//            executor.getQueue().clear();  // 清空任務
-//        }
-//
-//        super.close();
-//        log.info("Shutting down ReconnectWebSocketService");
-//    }
 }

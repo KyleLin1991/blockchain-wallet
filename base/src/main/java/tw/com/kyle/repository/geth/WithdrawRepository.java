@@ -11,4 +11,5 @@ import java.util.UUID;
  */
 public interface WithdrawRepository extends JpaRepository<WithdrawEntity, UUID> {
 
+    WithdrawEntity findByTransactionHash(byte[] transactionId);
 }

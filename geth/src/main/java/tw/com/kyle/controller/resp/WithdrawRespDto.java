@@ -27,6 +27,7 @@ public class WithdrawRespDto implements Serializable {
     private String to;
     private String balance;
     private String transactionHash;
+    private String gasPrice;
     private BigInteger nonce;
     private Timestamp withdrawTime;
 }
