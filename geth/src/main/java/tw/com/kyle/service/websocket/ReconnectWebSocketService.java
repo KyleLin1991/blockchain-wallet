@@ -1,77 +1,95 @@
 package tw.com.kyle.service.websocket;
 
+import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.websocket.WebSocketService;
 import tw.com.kyle.misc.GethProperties;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Kyle
  * @since 2025/3/24
  */
+@Slf4j
 @Setter
+@Getter
 @Service
-@CommonsLog
 public class ReconnectWebSocketService extends WebSocketService {
 
     private final String wsUrl;
     private final long delayMs;
-    private final ScheduledExecutorService scheduler;
     private volatile boolean isConnected = false;
     private volatile boolean isShuttingDown = false;
     private ReconnectListener reconnectListener;
 
-    public ReconnectWebSocketService(GethProperties gethProperties, ScheduledExecutorService scheduler) {
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    public ReconnectWebSocketService(GethProperties gethProperties) {
         super(gethProperties.getWsNodeUrl() + gethProperties.getApiKey(), true);
         this.wsUrl = gethProperties.getWsNodeUrl() + gethProperties.getApiKey();
         this.delayMs = gethProperties.getReconnectDelayMs();
-        this.scheduler = scheduler;
-        connectWithRetry(); // 初始化時連接
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        connectToWebSocket();
     }
 
     @Override
-    public void connect() {
-        connectWithRetry();
+    public void close() {
+        isShuttingDown = true;
+        isConnected = false;
+
+        log.info("WebSocket connection closed");
+
+        if (isShuttingDown) {
+            isShuttingDown = false;
+            scheduleReconnect(); // 僅在非主動關閉時重連
+        }
     }
 
-    private void connectWithRetry() {
+    private void connectToWebSocket() {
         if (isShuttingDown) {
-            log.info("Application is shutting down, skipping reconnect attempt");
+            log.info("Service is shutting down, skipping connection attempt");
             return;
         }
         try {
-            super.connect();
+            this.connect();
             isConnected = true;
-            log.info("WebSocket connected to: " + wsUrl);
+            isShuttingDown = false;
+            log.info("WebSocket connected to {}", this.wsUrl);
             if (reconnectListener != null) {
-                reconnectListener.onReconnect(); // 重連成功後調用回調
+                reconnectListener.onReconnect();
             }
+            eventPublisher.publishEvent(new WebSocketConnectedEvent(this));
         } catch (Exception e) {
+            log.error("Connection failed, retrying in {} ", this.delayMs + "ms...");
             isConnected = false;
-            log.error("Failed to connect to WebSocket: " + e.getMessage());
-            connectWithRetry();
+            scheduleReconnect();
         }
     }
 
-//    @Override
-//    public void close() {
-//        super.close();
-//        isConnected = false;
-//        log.info("WebSocket closed");
-//        if (!isShuttingDown) {
-//            connectWithRetry();
-//        }
-//    }
-
-    // 供外部觸發重連
-    public void reconnectOnError() {
-        if (isConnected && !isShuttingDown) {
-            isConnected = false;
-            log.info("Detected disconnection, scheduling reconnect...");
-            connectWithRetry();
+    // 設置重連監聽器
+    private void scheduleReconnect() {
+        if (!isShuttingDown && !isConnected) {
+            try {
+                scheduler.schedule(this::connectToWebSocket, this.delayMs, TimeUnit.MILLISECONDS);
+            } catch (RejectedExecutionException e) {
+                log.error("Failed to schedule reconnect: {}", e.getMessage());
+            }
         }
     }
 }

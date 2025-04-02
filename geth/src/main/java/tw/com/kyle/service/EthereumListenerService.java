@@ -1,9 +1,10 @@
 package tw.com.kyle.service;
 
 import io.reactivex.disposables.Disposable;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,7 +13,6 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.websocket.WebSocketService;
 import tw.com.kyle.entity.geth.DepositEntity;
 import tw.com.kyle.entity.geth.TransactionEntity;
 import tw.com.kyle.entity.geth.WalletEntity;
@@ -21,6 +21,7 @@ import tw.com.kyle.enums.TransactionStatus;
 import tw.com.kyle.enums.converter.TransactionStatusConverter;
 import tw.com.kyle.service.websocket.ReconnectListener;
 import tw.com.kyle.service.websocket.ReconnectWebSocketService;
+import tw.com.kyle.service.websocket.WebSocketConnectedEvent;
 
 import java.math.BigInteger;
 import java.util.Optional;
@@ -35,7 +36,6 @@ public class EthereumListenerService implements ReconnectListener {
 
     private final Web3j httpWeb3j;
     private final Web3j wsWeb3j;
-    private final WebSocketService webSocketService;
     private final DepositService depositService;
     private final WithdrawService withdrawService;
     private final WalletService walletService;
@@ -44,35 +44,39 @@ public class EthereumListenerService implements ReconnectListener {
 
     private long lastProcessedBlock = 0; // 記錄最後處理的區塊號
 
+    @Autowired
+    private ReconnectWebSocketService reconnectWebSocketService;
+
     public EthereumListenerService(
             @Qualifier("httpWeb3j") Web3j httpWeb3j,
             @Qualifier("wsWeb3j") Web3j wsWeb3j,
-            @Qualifier("webSocketService") WebSocketService webSocketService,
             DepositService depositService,
             WithdrawService withdrawService,
             WalletService walletService,
             TransactionService transactionService) {
         this.httpWeb3j = httpWeb3j;
         this.wsWeb3j = wsWeb3j;
-        this.webSocketService = webSocketService;
         this.depositService = depositService;
         this.withdrawService = withdrawService;
         this.walletService = walletService;
         this.transactionService = transactionService;
     }
 
-    @PostConstruct
-    public void init() {
-        if (webSocketService instanceof ReconnectWebSocketService) {
-            ((ReconnectWebSocketService) webSocketService).setReconnectListener(this);
-        }
+    @EventListener
+    public void onWebSocketConnected(WebSocketConnectedEvent event) {
         startListening();
     }
 
     private void startListening() {
+        if (!reconnectWebSocketService.isConnected()) {
+            log.warn("WebSocket not connected yet, skipping startListening");
+            return;
+        }
         if (subscription != null && !subscription.isDisposed()) {
             subscription.dispose(); // 確保舊訂閱被清理
         }
+        reconnectWebSocketService.setReconnectListener(this);
+
         subscription = wsWeb3j.blockFlowable(false)
                 .subscribe(block -> {
                     EthBlock ethBlock = wsWeb3j.ethGetBlockByHash(block.getBlock().getHash(), true).send();
@@ -92,6 +96,8 @@ public class EthereumListenerService implements ReconnectListener {
             EthBlock.TransactionObject transaction = (EthBlock.TransactionObject) tx.get();
             String fromAddress = transaction.getFrom();
             String toAddress = transaction.getTo();
+
+            // 交易金額
             BigInteger balance = transaction.getValue();
 
             // 檢查是否與錢包地址相關
@@ -218,12 +224,12 @@ public class EthereumListenerService implements ReconnectListener {
     private void recoverMissedBlocks() {
         try {
             // 獲取當前最新區塊號
-            EthBlockNumber latestBlock = httpWeb3j.ethBlockNumber().send();
+            EthBlockNumber latestBlock = wsWeb3j.ethBlockNumber().send();
             long currentBlock = latestBlock.getBlockNumber().longValue();
 
             // 從最後處理的區塊開始恢復
-            for (long blockNum = lastProcessedBlock + 1; blockNum <= currentBlock; blockNum++) {
-                EthBlock ethBlock = httpWeb3j.ethGetBlockByNumber(
+            for (long blockNum = lastProcessedBlock + 1; blockNum < currentBlock; blockNum++) {
+                EthBlock ethBlock = wsWeb3j.ethGetBlockByNumber(
                         DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNum)),
                         true
                 ).send();
@@ -242,6 +248,5 @@ public class EthereumListenerService implements ReconnectListener {
     public void onReconnect() {
         log.info("WebSocket reconnected, restarting Ethereum Listener...");
         recoverMissedBlocks(); // 恢復遺漏區塊
-        startListening(); // 重新啟動監聽
     }
 }

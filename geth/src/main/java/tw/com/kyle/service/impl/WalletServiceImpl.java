@@ -14,7 +14,6 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.websocket.WebSocketService;
 import tw.com.kyle.controller.req.CreateWalletReqDto;
 import tw.com.kyle.controller.resp.CreateWalletRespDto;
 import tw.com.kyle.dto.UserTokenDto;
@@ -25,6 +24,7 @@ import tw.com.kyle.repository.auth.AccountRepository;
 import tw.com.kyle.repository.geth.WalletRepository;
 import tw.com.kyle.service.BaseService;
 import tw.com.kyle.service.WalletService;
+import tw.com.kyle.service.websocket.ReconnectWebSocketService;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -53,19 +53,19 @@ public class WalletServiceImpl extends BaseService implements WalletService {
     private final AccountRepository accountRepository;
     private final Web3j httpWeb3j;
     private final VaultTemplate vaultTemplate;
-    private final WebSocketService webSocketService;
+    private final ReconnectWebSocketService reconnectWebSocketService;
 
     public WalletServiceImpl(
             WalletRepository walletRepository,
             AccountRepository accountRepository,
             @Qualifier("httpWeb3j") Web3j httpWeb3j,
             VaultTemplate vaultTemplate,
-            WebSocketService webSocketService) {
+            ReconnectWebSocketService reconnectWebSocketService) {
         this.walletRepository = walletRepository;
         this.accountRepository = accountRepository;
         this.httpWeb3j = httpWeb3j;
         this.vaultTemplate = vaultTemplate;
-        this.webSocketService = webSocketService;
+        this.reconnectWebSocketService = reconnectWebSocketService;
     }
 
     @Override
@@ -145,9 +145,9 @@ public class WalletServiceImpl extends BaseService implements WalletService {
 
     @Override
     public void simulateDisconnect() {
-        if (webSocketService != null) {
+        if (reconnectWebSocketService != null) {
             log.info("Simulating WebSocket disconnection...");
-            webSocketService.close();
+            reconnectWebSocketService.close();
         }
     }
 }
