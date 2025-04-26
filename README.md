@@ -1,11 +1,33 @@
-# Kyle Side Project
+🚀 Blockchain Wallet Gateway
+![區塊鏈錢包圖]([https://user-images.githubusercontent.com/12345678/abcde1234567.png](https://github.com/user-attachments/assets/01e2b1e0-fc48-46c8-818f-a1b2d369e1be))
 
-## 用到的技術與框架
-1.Spring boot 結合 Spring Security, Jwt, Swagger-UI  
-2.geth, spring vault
+✨ Features
+區塊鏈入金 (Deposit)
 
-### 目前實作的功能
-1.帳號與使用者資訊分離(前後台分離，還可以更完善)  
-2.依帳號權限來限制是否可以打API  
-3.使用geth自建節點，將錢包機敏資訊存入vault  
-4.新增alchemy節點及key(自建節點資料量太大，先用alchemy)，增加eth入金監聽功能
+監聽區塊所有 Transaction，符合系統錢包地址時，觸發入金邏輯。
+
+區塊鏈出金 (Withdrawal)
+
+監聽區塊所有 Transaction，符合系統錢包地址時，觸發出金邏輯。
+
+帳號管理
+
+基本使用者註冊、登入功能。
+
+帳戶餘額查詢。
+
+權限控管（例如：系統管理員 / 一般使用者）。
+
+交易紀錄
+
+詳細記錄每一筆入金與出金的交易資訊。
+
+🛠 技術棧
+Backend
+Spring Boot / Spring Data JPA / Spring Security / Spring Vault / JWT / Swagger-UI
+
+Blockchain SDK
+web3j / WebSocket
+
+Database
+PostgreSQL
