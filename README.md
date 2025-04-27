@@ -1,6 +1,6 @@
 # 🚀 Blockchain Wallet Gateway
 
-![區塊鏈錢包圖](你的圖片網址)
+![區塊鏈錢包圖](https://github.com/user-attachments/assets/01e2b1e0-fc48-46c8-818f-a1b2d369e1be)
 
 ---
 
